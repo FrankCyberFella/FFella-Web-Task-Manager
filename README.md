@@ -11,11 +11,11 @@ It is intended to be reviewed interactively by an instructor with comments being
 Database access expects tables used to be stored in a database called: ***taskmanger***
 
 Repo contents:
-- **database** folder - SQL to created relational PostgrSQL table used and populate with initial data.
+- **database** folder - SQL to create relational PostgrSQL table used and populate with initial data.
 - **taskmanager-server** - Spring Boot 2 MVC REST API server
   - **controller** - MVC API controller
   - **datasource/model** - Components related to application data used by server
-    - **exception** - Custom Exceptions for
+    - **exception** - Custom Exceptions
     - **taskmanager** - JDBC Components for accessing data source
   - **generalpurposeutilities** - Support code
       - **LogHttpRequest** - Components to log information about HTTP request received 
