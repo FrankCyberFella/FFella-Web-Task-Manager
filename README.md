@@ -27,4 +27,5 @@ Repo contents:
     - **services** - services containing API calls to server
     - **store** - Vuex data store
 - **Task Manager Demo.mp4** - Demo of project
+- **Web-Task-Manager-Design.png** - Overview of general project design
   
