@@ -4,7 +4,7 @@
 
 This project demonstrates a full-stack application using Java, Spring Boot 2 MVC Spring JDBC, PostgreSQL, REST API calls using Axios, Vue.js framework, HTML, CSS, Javascript et al.
 
-It is written to be used in a training presentation to review/introduce these technologies new entry-level developer students.
+It is written to be used in a training presentation to review/introduce these technologies to new entry-level developer students.
 
 It is intended to be reviewed interactively by an instructor with comments being added to the code and refactoring as it is being discussed/reviewed to document and reinforce what is covered.
 
