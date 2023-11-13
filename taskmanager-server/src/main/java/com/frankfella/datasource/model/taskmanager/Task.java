@@ -1,6 +1,7 @@
 package com.frankfella.datasource.model.taskmanager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -11,7 +12,8 @@ public class Task {
 
     private long      taskId;
     @NotNull (message="Due Date cannot be empty or blank")
-    @JsonFormat(pattern="MM/dd/yyyy")
+    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonProperty("duedate")
     private LocalDate dueDate;
     @NotNull
     @NotBlank (message="description cannot be empty or blank")

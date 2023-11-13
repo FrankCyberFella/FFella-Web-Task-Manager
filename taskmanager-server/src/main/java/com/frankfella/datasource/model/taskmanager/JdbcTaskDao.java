@@ -1,9 +1,14 @@
 package com.frankfella.datasource.model.taskmanager;
 
+import com.frankfella.datasource.model.exception.AddNewTaskException;
+import com.frankfella.datasource.model.exception.DeleteTaskException;
+import com.frankfella.datasource.model.exception.UpdateTaskException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +32,9 @@ public class JdbcTaskDao implements TaskDao {
 
         List<Task> theTasks = new ArrayList();
 
-        String allTasksSql = "Select taskId, description, dueDate, isComplete from task";
+        String allTasksSql = " Select taskId, description, dueDate, isComplete "
+                            +"  from task"
+                            +" order by duedate";
 
         SqlRowSet theSqlResult = theTaskManagerDatabase.queryForRowSet(allTasksSql);
 
@@ -47,7 +54,7 @@ public class JdbcTaskDao implements TaskDao {
 
         Task returnedTask = null;
 
-        String aTasksSql =  " Select taskId, description, dueDate, isComplete "
+        String aTasksSql =  " Select taskId, description,  dueDate, isComplete "
                           + "   from task"
                           +  " where taskId = ?";
 
@@ -71,14 +78,20 @@ public class JdbcTaskDao implements TaskDao {
                            + " values(?, ?, ?)"
                            + " returning taskId";
 
-        Long newTaskId = theTaskManagerDatabase.queryForObject(addATaskSQL
-                                                              ,Long.class
-                                                              ,newTask.getDueDate()
-                                                              ,newTask.getDescription()
-                                                              ,newTask.isComplete());
+        try {
+            Long newTaskId = theTaskManagerDatabase.queryForObject(addATaskSQL
+                    , Long.class
+                    , newTask.getDueDate()
+                    , newTask.getDescription()
+                    , newTask.isComplete());
 
+            return this.getTaskById(newTaskId);
+        }
+        catch(DataAccessException exceptionObject) {
+            throw new AddNewTaskException("Problem adding task: " + newTask
+                                         +"Error message: " + exceptionObject.getMessage());
 
-        return this.getTaskById(newTaskId);
+        }
     }
 
     /**
@@ -93,16 +106,49 @@ public class JdbcTaskDao implements TaskDao {
                              + "           , isComplete  = ?"
                              + "   where taskId = ?";
 
-        theTaskManagerDatabase.update(updateATaskSQL
-                                     ,updatedTask.getDueDate()
-                                     ,updatedTask.getDescription()
-                                     ,updatedTask.isComplete()
-                                     ,updatedTask.getTaskId());
+        try {
+            theTaskManagerDatabase.update(updateATaskSQL
+                    , updatedTask.getDueDate()
+                    , updatedTask.getDescription()
+                    , updatedTask.isComplete()
+                    , updatedTask.getTaskId());
 
-        Task aTask = this.getTaskById(updatedTask.getTaskId());
+            Task aTask = this.getTaskById(updatedTask.getTaskId());
 
-        return this.getTaskById(updatedTask.getTaskId());
+            return this.getTaskById(updatedTask.getTaskId());
+        }
+        catch(DataAccessException exceptionObject) {
+            throw new UpdateTaskException("Problem updating task: " + updatedTask
+                    +"Error message: " + exceptionObject.getMessage());
+
+        }
     }
+
+    /**
+     * Remove a given task from data source
+     *
+     * @param taskId
+     */
+    @Override
+    public void deleteATask(Long taskId) {
+
+        String deleteATaskSql = " delete from task"
+                               +"  where taskId = ?";
+
+
+        try {
+            int numRowsDeleted = theTaskManagerDatabase.update(deleteATaskSql, taskId);
+            if(numRowsDeleted == 0) {
+                throw new DataAccessException("Error deleting task from data source - Task may not have been deleted") {
+                };
+            }
+        }
+        catch(DataAccessException exceptionObject) {
+            throw new DeleteTaskException("Error deleting task from data source - Task may not have been deleted"
+                    + exceptionObject.getMessage() == "" ? "Error message: " + exceptionObject.getMessage() : "");
+        }
+   }
+
 
 
     public Task MapRowToTaskObject(SqlRowSet tableRow) {
@@ -114,5 +160,4 @@ public class JdbcTaskDao implements TaskDao {
         aTask.setDueDate(tableRow.getDate("dueDate").toLocalDate());
 
         return aTask;
-    }
-}
+    }}

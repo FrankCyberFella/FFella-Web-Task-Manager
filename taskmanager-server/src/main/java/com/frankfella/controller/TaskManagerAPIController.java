@@ -6,11 +6,13 @@ import com.frankfella.datasource.model.taskmanager.TaskDao;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 import static com.frankfella.generalpurposeutilities.LogHttpRequest.logHttpRequest;
+import static com.frankfella.generalpurposeutilities.LogHttpRequest.logMessage;
 
 @RestController
 @CrossOrigin
@@ -23,9 +25,9 @@ public class TaskManagerAPIController {
     }
 
     @RequestMapping(path="/tasks", method=RequestMethod.GET)
-    public List<Task> returnAllTasks(HttpServletRequest theRequest) {
+    public ResponseEntity<List<Task>> returnAllTasks(HttpServletRequest theRequest) {
         logHttpRequest(theRequest);
-        return theTasksDatasource.getAllTasks();
+        return new ResponseEntity(theTasksDatasource.getAllTasks(), HttpStatus.OK);
     }
 
     @RequestMapping(path="/tasks/{taskId}", method=RequestMethod.GET)
@@ -39,15 +41,32 @@ public class TaskManagerAPIController {
     public Task addANewTask(HttpServletRequest theRequest
                           , @Valid @RequestBody Task newTask ) {
         logHttpRequest(theRequest);
+        logMessage("Payload: " + newTask);
         return theTasksDatasource.addATask(newTask);
     }
 
 
     @RequestMapping(path="/tasks", method=RequestMethod.PUT)
-    public Task updateATask(HttpServletRequest theRequest
-            , @Valid @RequestBody Task newTask ) {
+    public ResponseEntity<Task> updateATask(HttpServletRequest theRequest
+            , @Valid @RequestBody Task updatedTask ) {
         logHttpRequest(theRequest);
-        return theTasksDatasource.updateATask(newTask);
+        logMessage("Payload: " + updatedTask);
+        return new ResponseEntity(theTasksDatasource.updateATask(updatedTask), HttpStatus.OK);
+    }
+
+    @RequestMapping(path="/tasks/{taskId}", method=RequestMethod.DELETE)
+    public ResponseEntity deleteATask(HttpServletRequest theRequest
+                          , @PathVariable Long taskId) {
+        logHttpRequest(theRequest);
+        try {
+            theTasksDatasource.deleteATask(taskId);
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        catch(Exception exceptionObject) {
+            logMessage(exceptionObject.getClass() + " thrown"
+                     + " with message: " + exceptionObject.getLocalizedMessage());
+            return  new ResponseEntity("Error deleting task from data source", HttpStatus.CONFLICT);
+        }
     }
 
 
