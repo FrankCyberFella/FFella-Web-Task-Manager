@@ -1,6 +1,6 @@
-#Task Manager / Todo List Project
+# Task Manager / Todo List Project
 
-###Description
+### Description
 
 This project demonstrates a full-stack application using Java, Spring Boot 2 MVC Spring JDBC, PostgreSQL, REST API calls using Axios, Vue.js framework, HTML, CSS, Javascript et al.
 
